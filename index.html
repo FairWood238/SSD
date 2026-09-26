@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SSD Bluetooth Controller</title>
+<link rel="stylesheet" href="css/main.css?v=20250519">
+</head>
+ 
+<body>
+<div class="main">
+<h3>SSD Bluetooth Controller</h3>
+ 
+<fieldset>
+<legend>Bluetooth Connection</legend>
+ 
+<div class="flex-container">
+<div class="flex-group">
+<button id="connectbutton" type="button" class="primary" onclick="preConnect()">Connect</button>
+<button id="reconnectbutton" type="button" class="secondary" onclick="reConnect()">Reconnect</button>
+<button type="button" class="secondary" onclick="clearLog()">Clear Log</button>
+</div>
+ 
+<div class="flex-group debug">
+<label for="epddriver">Driver</label>
+<select id="epddriver" onchange="filterDitheringOptions()">
+<option value="04">SSD1619 / SSD1683 (Black & White)</option>
+<option value="02">SSD1619 / SSD1683 (3-Color)</option>
+<option value="06">GDT0213-JD (Black & White)</option>
+</select>
+</div>
+ 
+<div class="flex-group debug">
+<label for="epdpins">Pins</label>
+<input id="epdpins" type="text" value="">
+<button id="setDriverbutton" type="button" class="primary" onclick="setDriver()">Apply</button>
+</div>
+ 
+<div class="flex-group">
+<button id="calendarmodebutton" type="button" class="primary" onclick="syncTime(1)">Calendar Mode</button>
+<button id="clockmodebutton" type="button" class="primary" onclick="syncTime(2)">Clock Mode</button>
+<button id="clearscreenbutton" type="button" class="secondary" onclick="clearScreen()">Clear Screen</button>
+</div>
+ 
+<div class="flex-group debug">
+<input type="text" id="cmdTXT" value="">
+<button id="sendcmdbutton" type="button" class="primary" onclick="sendcmd()">Send Command</button>
+</div>
+</div>
+ 
+<div id="log"></div>
+</fieldset>
+ 
+<fieldset>
+<legend>Bluetooth Image Transfer</legend>
+ 
+<div class="flex-container">
+<input type="file"
+id="image_file"
+onchange="update_image(true)"
+accept=".png,.jpg,.bmp,.webp,.jpeg">
+</div>
+ 
+<div class="flex-container">
+<div class="flex-group">
+<label for="dithering">Dithering Algorithm</label>
+<select id="dithering"
+title="Dithering Algorithm"
+onchange="update_image(false)">
+ 
+<optgroup data-driver="01|04|06" label="Black & White">
+<option value="none">Threshold</option>
+<option value="bayer">Bayer</option>
+<option value="floydsteinberg">Floyd-Steinberg</option>
+<option value="Atkinson">Atkinson</option>
+</optgroup>
+ 
+<optgroup id="dithering-bwr"
+data-driver="02|03"
+label="3-Color">
+<option value="bwr_floydsteinberg">
+Black / White / Red Floyd-Steinberg
+</option>
+<option value="bwr_Atkinson">
+Black / White / Red Atkinson
+</option>
+</optgroup>
+ 
+</select>
+</div>
+ 
+<div class="flex-group">
+<label for="threshold">Threshold</label>
+<input type="number"
+max="255"
+min="0"
+value="125"
+id="threshold"
+onchange="update_image(false)">
+</div>
+ 
+<div class="flex-group debug">
+<label for="mtusize">MTU</label>
+<input type="number"
+id="mtusize"
+value="20"
+min="0"
+max="255">
+ 
+<label for="interleavedcount">ACK Interval</label>
+<input type="number"
+id="interleavedcount"
+value="50"
+min="0"
+max="500">
+</div>
+</div>
+ 
+<div class="status-bar">
+<b>Status:</b>
+<span id="status"></span>
+</div>
+ 
+<div class="flex-container">
+<div class="flex-group">
+<button id="clearcanvasbutton"
+type="button"
+class="secondary"
+onclick="clear_canvas()">
+Clear Canvas
+</button>
+ 
+<button id="sendimgbutton"
+type="button"
+class="primary"
+onclick="sendimg()">
+Send Image
+</button>
+</div>
+</div>
+ 
+<div class="canvas-container">
+ 
+<div class="canvas-title"></div>
+ 
+<canvas id="canvas"
+width="128"
+height="250">
+</canvas>
+ 
+<div class="flex-container canvas-tools">
+<div class="flex-group">
+ 
+<button id="brush-mode"
+title="Brush"
+class="tool-button">✏️</button>
+ 
+<button id="eraser-mode"
+title="Eraser"
+class="tool-button">🧽</button>
+ 
+<button id="text-mode"
+title="Add Text"
+class="tool-button">T</button>
+ 
+<label for="brush-color">Brush Color</label>
+ 
+<select id="brush-color" title="Brush Color">
+<option value="#000000">Black</option>
+<option value="#FF0000">Red</option>
+<option value="#FFFFFF">White</option>
+</select>
+ 
+<input type="number"
+id="brush-size"
+value="2"
+min="1"
+max="100"
+title="Brush Size">
+</div>
+</div>
+ 
+<div class="flex-container canvas-tools">
+<div class="flex-group text-tools">
+ 
+<label for="font-family">Font</label>
+ 
+<select id="font-family">
+ 
+<option value="Arial">Arial</option>
+<option value="sans-serif">Sans-serif</option>
+<option value="monospace">Monospace</option>
+ 
+<option value="SimSun">SimSun</option>
+<option value="SimHei">SimHei</option>
+<option value="Microsoft Yahei">Microsoft YaHei</option>
+<option value="Microsoft JhengHei">Microsoft JhengHei</option>
+<option value="KaiTi">KaiTi</option>
+<option value="NSimSun">NSimSun</option>
+<option value="FangSong">FangSong</option>
+<option value="YouYuan">YouYuan</option>
+<option value="LiSu">LiSu</option>
+<option value="STHeiti">STHeiti</option>
+<option value="STXihei">STXihei</option>
+<option value="STKaiti">STKaiti</option>
+<option value="STSong">STSong</option>
+<option value="STFangsong">STFangsong</option>
+<option value="STZhongsong">STZhongsong</option>
+<option value="STHupo">STHupo</option>
+<option value="STXinwei">STXinwei</option>
+<option value="STLiti">STLiti</option>
+<option value="STXingkai">STXingkai</option>
+<option value="FZShuTi">FZShuTi</option>
+<option value="FZYaoti">FZYaoti</option>
+<option value="PingFang SC">PingFang SC</option>
+<option value="Source Han Sans CN">Source Han Sans</option>
+<option value="Source Han Serif SC">Source Han Serif</option>
+<option value="WenQuanYi Micro Hei">WenQuanYi Micro Hei</option>
+ 
+</select>
+ 
+<label for="font-size">Font Size</label>
+ 
+<input type="number"
+id="font-size"
+value="16"
+min="1"
+max="100">
+ 
+</div>
+ 
+<div class="flex-group text-tools">
+ 
+<input type="text"
+id="text-input"
+placeholder="Enter Text"
+style="width:150px">
+ 
+<button id="text-bold" title="Bold">B</button>
+<button id="text-italic" title="Italic">I</button>
+ 
+<button id="add-text-btn"
+class="primary">
+Add Text
+</button>
+ 
+</div>
+</div>
+ 
+</div>
+</fieldset>
+ 
+<div class="footer">
+<span class="copy">&copy; 2025 tfl0528.</span>
+ 
+<span class="links">
+<a href="?debug=true"
+id="debug-toggle">
+Developer Mode
+</a>
+</span>
+</div>
+ 
+</div>
+ 
+<script type="text/javascript" src="js/dithering.js?v=20250519"></script>
+<script type="text/javascript" src="js/main.js?v=20250519"></script>
+<script type="text/javascript" src="js/paint.js?v=20250519"></script>
+ 
+</body>
