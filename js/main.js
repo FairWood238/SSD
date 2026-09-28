@@ -199,7 +199,24 @@ async function preConnect() {
   }
   else {
     //... (original device request / filter logic remains here, no Chinese in this section)
-    //resetVariables();
+    resetVariables();
+    try {
+      bleDevice = await navigator.bluetooth.requestDevice({
+        optionalServices: ['62750001-d828-918d-fb46-b6c11c675aec'],
+        acceptAllDevices: true
+      });
+    } catch (e) {
+      console.error(e);
+      if (e.message) addLog("requestDevice: " + e.message);
+      addLog("Please ensure Bluetooth is turned on and supported by your browser. Recommended browsers:");
+      addLog("• Computer: Chrome/Edge");
+      addLog("• Android: Chrome/Edge");
+      addLog("• iOS: Bluefy browser");
+      return;
+    }
+
+    await bleDevice.addEventListener('gattserverdisconnected', disconnect);
+    setTimeout(async function () { await connect(); }, 300);
   }
 }
 
