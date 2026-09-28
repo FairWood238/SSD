@@ -219,6 +219,13 @@ async function preConnect() {
     setTimeout(async function () { await connect(); }, 300);
   }
 }
+async function reConnect() {
+  if (bleDevice != null && bleDevice.gatt.connected)
+    bleDevice.gatt.disconnect();
+  resetVariables();
+  addLog("正在重连");
+  setTimeout(async function () { await connect(); }, 300);
+}
 
 // --- handleNotify section ---
 function handleNotify(data, idx) {
