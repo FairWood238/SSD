@@ -199,6 +199,7 @@ async function preConnect() {
   }
   else {
     //... (original device request / filter logic remains here, no Chinese in this section)
+    //resetVariables();
   }
 }
 
