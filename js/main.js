@@ -223,7 +223,7 @@ async function reConnect() {
   if (bleDevice != null && bleDevice.gatt.connected)
     bleDevice.gatt.disconnect();
   resetVariables();
-  addLog("正在重连");
+  addLog("Reconnecting");
   setTimeout(async function () { await connect(); }, 300);
 }
 
