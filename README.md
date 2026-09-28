@@ -1,4 +1,4 @@
 # SSD
 SSD controller
 
-Refer to njtfl/gdlcd
+Change nitfl.gdlcd interface language from Chinese to English.
