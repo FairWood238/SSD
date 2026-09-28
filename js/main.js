@@ -211,7 +211,7 @@ async function preConnect() {
       addLog("Please ensure Bluetooth is turned on and supported by your browser. Recommended browsers:");
       addLog("• Computer: Chrome/Edge");
       addLog("• Android: Chrome/Edge");
-      addLog("• iOS: Bluefy browser");
+      addLog("• iOS: Bluefy");
       return;
     }
 
